@@ -1,23 +1,57 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Footer from "./components/Footer";
+import Navbar from "./components/Navbar";
+import Home from "./Pages/Home";
+import NotFound from "./Pages/NotFound";
+import SearchPage from "./Pages/SearchPage";
+import SingleMovie from "./Pages/SingleMovie";
+import Search from "./components/Search";
+import Favourites from "./Pages/Favourites";
 
 function App() {
+  const [showSearch, setShowSearch] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [watchList, setWatchList] = useState(
+    JSON.parse(localStorage.getItem("watchList")) || []
+  );
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <BrowserRouter>
+        <Navbar setShowSearch={setShowSearch} watchList={watchList} />
+        <Search
+          showSearch={showSearch}
+          setShowSearch={setShowSearch}
+          setCurrentPage={setCurrentPage}
+        />
+        <Routes>
+          <Route
+            path="/"
+            element={<Home setWatchList={setWatchList} watchList={watchList} />}
+          />
+          <Route
+            path="/search/:query"
+            element={
+              <SearchPage
+                setCurrentPage={setCurrentPage}
+                currentPage={currentPage}
+                setWatchList={setWatchList}
+                watchList={watchList}
+              />
+            }
+          />
+          <Route path="/movie/:id" element={<SingleMovie />} />
+          <Route
+            path="/favourites"
+            element={
+              <Favourites watchList={watchList} setWatchList={setWatchList} />
+            }
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Footer />
+      </BrowserRouter>
     </div>
   );
 }
